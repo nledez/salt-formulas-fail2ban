@@ -1,10 +1,17 @@
+{%- set packages_upgrade = salt['pillar.get']('packages_upgrade', False) %}
+{%- if packages_upgrade %}
+  {%- set pkg_install_or_latest = 'pkg.latest' %}
+{%- else %}
+  {%- set pkg_install_or_latest = 'pkg.installed' %}
+{%- endif %}
+
 {% set banaction = salt['pillar.get']('fail2ban:banaction', 'hostsdeny') %}
 {% set lsb_distrib_id = salt['grains.get']('lsb_distrib_id', 'Debian') %}
 {% set lsb_distrib_codename = salt['grains.get']('lsb_distrib_codename', 'stretch') %}
 
 fail2ban:
-  pkg:
-    - installed
+  {{ pkg_install_or_latest }}:
+    - name: fail2ban
   service.running:
     - enable: true
     - watch:
